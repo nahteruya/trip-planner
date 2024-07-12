@@ -4,13 +4,20 @@ import { InviteGuestsModal } from "./components/invite-guests-modal";
 import { ConfirmTripModal } from "./components/confirm-trip-modal";
 import { DestinationAndDateForm } from "./components/destination-and-date-form";
 import { GuestsForm } from "./components/guests-form";
+import { DateRange } from "react-day-picker";
+import { api } from "../../lib/axios";
 
 export function CreateTripPage() {
   const navigate = useNavigate();
   const [isGuestsInputOpen, setIsGuestsInputOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
-  const [guestsList, setGuestsList] = useState<string[]>([]);
   const [isConfirmTripModalOpen, setIsConfirmTripModalOpen] = useState(false);
+
+  const [destination, setDestination] = useState("");
+  const [tripRangeDate, setTripRangeDate] = useState<DateRange | undefined>();
+  const [guestsList, setGuestsList] = useState<string[]>([]);
+  const [ownerName, setOwnerName] = useState("");
+  const [ownerEmail, setOwnerEmail] = useState("");
 
   function openGuestsInput() {
     setIsGuestsInputOpen(true);
@@ -59,13 +66,44 @@ export function CreateTripPage() {
     setIsConfirmTripModalOpen(false);
   }
 
-  function createTrip(e: FormEvent<HTMLFormElement>) {
+  async function createTrip(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    navigate("/trips/123");
+    console.log(destination);
+    console.log(tripRangeDate);
+    console.log(ownerName);
+    console.log(ownerEmail);
+
+    if (!destination) {
+      return;
+    }
+
+    if (!tripRangeDate?.from || !tripRangeDate?.to) {
+      return;
+    }
+
+    if (guestsList.length === 0) {
+      return;
+    }
+
+    if (!ownerName || !ownerEmail) {
+      return;
+    }
+
+    const response = await api.post("/trips", {
+      destination: destination,
+      starts_at: tripRangeDate.from,
+      ends_at: tripRangeDate.to,
+      emails_to_invite: guestsList,
+      owner_name: ownerName,
+      owner_email: ownerEmail,
+    });
+
+    const { tripId } = response.data;
+    navigate(`/trips/${tripId}`);
   }
 
   return (
-    <div className="bg-pattern flex h-screen items-center justify-center bg-center bg-no-repeat">
+    <div className="flex h-screen items-center justify-center bg-pattern bg-center bg-no-repeat">
       <div className="w-full max-w-3xl space-y-10 px-6 text-center">
         <div className="flex flex-col gap-3">
           <img src="/Logo.svg" alt="Logo planner" className="mx-auto" />
@@ -79,6 +117,9 @@ export function CreateTripPage() {
             isGuestsInputOpen={isGuestsInputOpen}
             openGuestsInput={openGuestsInput}
             closeGuestsInput={closeGuestsInput}
+            setDestination={setDestination}
+            setTripRangeDate={setTripRangeDate}
+            tripRangeDate={tripRangeDate}
           />
 
           {isGuestsInputOpen && (
@@ -116,6 +157,8 @@ export function CreateTripPage() {
           <ConfirmTripModal
             closeConfirmTripModal={closeConfirmTripModal}
             createTrip={createTrip}
+            setOwnerName={setOwnerName}
+            setOwnerEmail={setOwnerEmail}
           />
         )}
       </div>
