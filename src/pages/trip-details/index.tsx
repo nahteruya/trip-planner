@@ -6,10 +6,13 @@ import { Guests } from "./components/guests";
 import { Activities } from "./components/activities";
 import { DestinationAndDateHeader } from "./components/destination-and-date-header";
 import { Button } from "../../components/Button";
+import { CreateLinkModal } from "./components/create-link-modal";
 
 export function TripDetailsPage() {
   const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] =
     useState(false);
+  const [isCreateLinkModalOpen, setIsCreateLinkModalOpen] = useState(false);
+  // const [isManageGuestsModalOpen, setIsManageGuestsModalOpen] = useState(false);
 
   function openCreateActivityModal() {
     setIsCreateActivityModalOpen(true);
@@ -18,6 +21,22 @@ export function TripDetailsPage() {
   function closeCreateActivityModal() {
     setIsCreateActivityModalOpen(false);
   }
+
+  function openCreateLinkModal() {
+    setIsCreateLinkModalOpen(true);
+  }
+
+  function closeCreateLinkModal() {
+    setIsCreateLinkModalOpen(false);
+  }
+
+  //   function openManageGuestsModal() {
+  //   setIsManageGuestsModalOpen(true);
+  // }
+
+  // function closeManageGuestsModal() {
+  //   setIsManageGuestsModalOpen(false);
+  // }
 
   return (
     <div className="mx-auto w-full max-w-5xl px-5 py-10">
@@ -37,7 +56,7 @@ export function TripDetailsPage() {
         </div>
 
         <aside className="w-80">
-          <ImportantLinks />
+          <ImportantLinks openCreateLinkModal={openCreateLinkModal} />
 
           <div className="my-6 h-px w-full bg-zinc-800" />
 
@@ -49,6 +68,10 @@ export function TripDetailsPage() {
         <CreateActivityModal
           closeCreateActivityModal={closeCreateActivityModal}
         />
+      )}
+
+      {isCreateLinkModalOpen && (
+        <CreateLinkModal closeCreateLinkModal={closeCreateLinkModal} />
       )}
     </div>
   );
