@@ -1,8 +1,15 @@
-import { Mail, User, X } from "lucide-react";
+import { Mail, User } from "lucide-react";
 import { FormEvent } from "react";
 import { Button } from "../../../../components/Button";
+import { Input } from "../../../../components/Input";
+import { Modal } from "../../../../components/Modal";
+import { DateRange } from "react-day-picker";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 interface ConfirmTripModalProps {
+  destination: string;
+  tripRangeDate: DateRange | undefined;
   closeConfirmTripModal: () => void;
   createTrip: (event: FormEvent<HTMLFormElement>) => void;
   setOwnerName: (ownerName: string) => void;
@@ -14,58 +21,42 @@ export function ConfirmTripModal({
   createTrip,
   setOwnerName,
   setOwnerEmail,
+  destination,
+  tripRangeDate,
 }: ConfirmTripModalProps) {
+  const displayedDate =
+    tripRangeDate && tripRangeDate.from && tripRangeDate.to
+      ? `${format(tripRangeDate.from, "d' de 'LLLL", { locale: ptBR })} até ${format(tripRangeDate.to, "d' de 'LLLL", { locale: ptBR })}`
+      : null;
+  const subtitle = `Para concluir a criação da viagem para ${destination} nas datas de ${displayedDate} preencha seus dados abaixo:`;
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black/60">
-      <div className="w-[540px] space-y-5 rounded-xl bg-zinc-900 px-6 py-5 shadow-shape">
-        <header className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-white">
-              Confirmar criação de viagem
-            </h2>
-            <button onClick={closeConfirmTripModal}>
-              <X className="size-5 text-zinc-400" />
-            </button>
-          </div>
-          <p className="text-left text-sm text-zinc-400">
-            Para concluir a criação da viagem para{" "}
-            <span className="font-bold text-zinc-100">
-              Florianópolis, Brasil
-            </span>{" "}
-            nas datas de{" "}
-            <span className="font-bold text-zinc-100">
-              16 a 27 de Agosto de 2024
-            </span>{" "}
-            preencha seus dados abaixo:
-          </p>
-        </header>
+    <Modal
+      title="Confirmar criação de viagem"
+      subtitle={subtitle}
+      closeModal={closeConfirmTripModal}
+    >
+      <form onSubmit={createTrip} className="space-y-3">
+        <Input
+          type="text"
+          name="fullname"
+          placeholder="Seu nome completo"
+          onChange={(event) => setOwnerName(event.target.value)}
+        >
+          <User className="size-5 text-zinc-400" />
+        </Input>
+        <Input
+          type="email"
+          name="email"
+          placeholder="Seu e-mail pessoal"
+          onChange={(event) => setOwnerEmail(event.target.value)}
+        >
+          <Mail className="size-5 text-zinc-400" />
+        </Input>
 
-        <form onSubmit={createTrip} className="space-y-3">
-          <div className="flex h-14 items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-4">
-            <User className="size-5 text-zinc-400" />
-            <input
-              type="text"
-              name="fullname"
-              placeholder="Seu nome completo"
-              onChange={(event) => setOwnerName(event.target.value)}
-              className="flex-1 bg-transparent outline-none"
-            />
-          </div>
-          <div className="flex h-14 items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-4">
-            <Mail className="size-5 text-zinc-400" />
-            <input
-              type="email"
-              name="email"
-              placeholder="Seu e-mail pessoal"
-              onChange={(event) => setOwnerEmail(event.target.value)}
-              className="flex-1 bg-transparent outline-none"
-            />
-          </div>
-          <Button type="submit" variant="primary" size="full">
-            Confirmação criação da viagem
-          </Button>
-        </form>
-      </div>
-    </div>
+        <Button type="submit" variant="primary" size="full">
+          Confirmação criação da viagem
+        </Button>
+      </form>
+    </Modal>
   );
 }

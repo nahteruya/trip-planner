@@ -1,10 +1,11 @@
-import { ArrowRight, Calendar, MapPin, Settings2, X } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Settings2 } from "lucide-react";
 import { Button } from "../../../../components/Button";
 import { useState } from "react";
 import { DateRange, DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Modal } from "../../../../components/Modal";
 
 interface DestinationAndDateFormProps {
   isGuestsInputOpen: boolean;
@@ -68,27 +69,15 @@ export function DestinationAndDateForm({
       <div className="h-6 w-px bg-zinc-800" />
 
       {isRangeDatePickerModalOpen && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/60">
-          <div className="space-y-5 rounded-xl bg-zinc-900 px-6 py-5 shadow-shape">
-            <header className="space-y-2">
-              <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-white">
-                  Selecione a data
-                </h2>
-                <button onClick={closeRangeDatePickerModal}>
-                  <X className="size-5 text-zinc-400" />
-                </button>
-              </div>
-            </header>
-
-            <DayPicker
-              mode="range"
-              selected={tripRangeDate}
-              onSelect={setTripRangeDate}
-              modifiersClassNames={{ selected: "bg-lime-300 text-lime-950" }}
-            />
-          </div>
-        </div>
+        <Modal title="Selecione a data" closeModal={closeRangeDatePickerModal}>
+          <DayPicker
+            mode="range"
+            selected={tripRangeDate}
+            onSelect={setTripRangeDate}
+            modifiersClassNames={{ selected: "bg-lime-300 text-lime-950" }}
+            disabled={{ before: new Date() }}
+          />
+        </Modal>
       )}
 
       {isGuestsInputOpen ? (

@@ -68,10 +68,6 @@ export function CreateTripPage() {
 
   async function createTrip(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(destination);
-    console.log(tripRangeDate);
-    console.log(ownerName);
-    console.log(ownerEmail);
 
     if (!destination) {
       return;
@@ -159,6 +155,8 @@ export function CreateTripPage() {
             createTrip={createTrip}
             setOwnerName={setOwnerName}
             setOwnerEmail={setOwnerEmail}
+            destination={destination}
+            tripRangeDate={tripRangeDate}
           />
         )}
       </div>
