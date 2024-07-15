@@ -10,7 +10,11 @@ interface Link {
   url: string;
 }
 
-export function ImportantLinks() {
+interface ImportantLinksProps {
+  openCreateLinkModal: () => void;
+}
+
+export function ImportantLinks({ openCreateLinkModal }: ImportantLinksProps) {
   const [importantLinksList, setImportantLinksList] = useState<Link[]>([]);
   const { tripId } = useParams();
 
@@ -34,14 +38,14 @@ export function ImportantLinks() {
               <span className="font-medium text-zinc-100">{link.title}</span>
               <p className="truncate text-sm text-zinc-400">{link.url}</p>
             </div>
-            <a href={link.url}>
+            <a href={link.url} target="_blank">
               <Link2 className="size-5 text-zinc-400" />
             </a>
           </div>
         ))}
       </div>
 
-      <Button variant="secondary" size="full">
+      <Button onClick={openCreateLinkModal} variant="secondary" size="full">
         <Plus className="size-5 text-zinc-200" />
         Cadastrar novo link
       </Button>

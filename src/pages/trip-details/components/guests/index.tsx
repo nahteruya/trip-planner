@@ -1,19 +1,35 @@
 import { CircleCheck, CircleDashed, UserCog } from "lucide-react";
 import { Button } from "../../../../components/Button";
-import { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../../../../lib/axios";
+import { InviteGuestsModal } from "../../../create-trip/components/invite-guests-modal";
 
-interface Participant {
+export interface Participant {
   id: string;
   name: string | null;
   email: string;
   is_confirmed: boolean;
 }
 
+// interface GuestsProps {
+//   isManageGuestsModalOpen: boolean;
+//   openManageGuestsModal: () => void;
+//   closeManageGuestsModal: () => void;
+// }
+
 export function Guests() {
+  const [isManageGuestsModalOpen, setIsManageGuestsModalOpen] = useState(false);
   const [guestsList, setGuestsList] = useState<Participant[]>([]);
   const { tripId } = useParams();
+
+  function openManageGuestsModal() {
+    setIsManageGuestsModalOpen(true);
+  }
+
+  function closeManageGuestsModal() {
+    setIsManageGuestsModalOpen(false);
+  }
 
   useEffect(() => {
     async function fetchTripData() {
@@ -23,6 +39,20 @@ export function Guests() {
     }
     fetchTripData();
   }, [tripId]);
+
+  async function handleAddGuestOnList(e: FormEvent<HTMLFormElement>) {
+    const data = new FormData(e.currentTarget);
+    const email = data.get("email")?.toString();
+    await api.post(`/trips/${tripId}/invites`, {
+      email,
+    });
+  }
+
+  function handleRemoveGuestFromList(guest: string) {
+    setGuestsList((prevGuestsList) =>
+      prevGuestsList.filter((item) => item.email !== guest),
+    );
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -49,10 +79,19 @@ export function Guests() {
         ))}
       </div>
 
-      <Button variant="secondary" size="full">
+      <Button onClick={openManageGuestsModal} variant="secondary" size="full">
         <UserCog className="size-5 text-zinc-200" />
         Gerenciar convidados
       </Button>
+
+      {isManageGuestsModalOpen && (
+        <InviteGuestsModal
+          guestsList={guestsList.map((guest) => guest.email)}
+          addGuestToList={handleAddGuestOnList}
+          closeGuestsModal={closeManageGuestsModal}
+          removeGuestFromList={handleRemoveGuestFromList}
+        />
+      )}
     </div>
   );
 }
